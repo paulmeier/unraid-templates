@@ -1,0 +1,136 @@
+<Container>
+  <Name>Actual MCP Server</Name>
+  <Repository>sstefanov/actual-mcp:latest</Repository>
+  <Registry>https://hub.docker.com/r/sstefanov/actual-mcp</Registry>
+  <Network>bridge</Network>
+  <Privileged>false</Privileged>
+
+  <Support>https://github.com/s-stefanov/actual-mcp/issues</Support>
+  <Project>https://github.com/s-stefanov/actual-mcp</Project>
+
+  <Category>Productivity: Finance;AI: Tools</Category>
+
+  <Icon>https://raw.githubusercontent.com/paulmeier/unraid-templates/main/icons/actual-mcp.png</Icon>
+
+  <Overview>
+    MCP server for Actual Budget. Can connect to a remote Actual Budget API server
+    or load a local budget directory. Exposes a Model Context Protocol SSE endpoint
+    for AI assistants such as Claude and Codex.
+  </Overview>
+
+  <WebUI>http://[IP]:[PORT:3000]</WebUI>
+
+  <!-- PORT -->
+  <Config Name="SSE Port"
+          Target="3000"
+          Default="3000"
+          Mode="tcp"
+          Type="Port"
+          Display="always"
+          Required="true">
+    Port where the MCP SSE server listens.
+  </Config>
+
+  <!-- OPTIONAL LOCAL DATA PATH (FOR LOCAL MODE) -->
+  <Config Name="Local Actual Data Directory"
+          Target="/data"
+          Default=""
+          Mode="rw"
+          Type="Path"
+          Display="always"
+          Required="false">
+    Optional. Host path to your Actual Budget data directory when using local data mode.
+    This is mounted at the path /data inside the container.
+  </Config>
+
+  <!-- REMOTE API MODE (DEFAULT) -->
+  <Config Name="ACTUAL_SERVER_URL"
+          Target="ACTUAL_SERVER_URL"
+          Default="http://actual-budget:5006"
+          Type="Variable"
+          Display="always"
+          Required="false">
+    URL of the remote Actual Budget API server. When set, the MCP server uses API mode.
+    Leave empty when using local data mode only.
+  </Config>
+
+  <Config Name="ACTUAL_PASSWORD"
+          Target="ACTUAL_PASSWORD"
+          Default=""
+          Type="Variable"
+          Mask="true"
+          Display="always"
+          Required="false">
+    Actual Budget server password. Required only when using the remote API server.
+  </Config>
+
+  <Config Name="ACTUAL_BUDGET_SYNC_ID"
+          Target="ACTUAL_BUDGET_SYNC_ID"
+          Default=""
+          Type="Variable"
+          Display="always"
+          Required="false">
+    Optional budget sync identifier for multi budget setups.
+  </Config>
+
+  <!-- LOCAL DATA MODE ENV -->
+  <Config Name="ACTUAL_DATA_DIR"
+          Target="ACTUAL_DATA_DIR"
+          Default=""
+          Type="Variable"
+          Display="advanced"
+          Required="false">
+    Optional. Path inside the container to the budget directory when using local data mode.
+    For example, set this to /data when Local Actual Data Directory is mapped.
+    When ACTUAL_SERVER_URL is empty and ACTUAL_DATA_DIR is set, the MCP server uses local data mode.
+  </Config>
+
+  <!-- OPTIONAL ENCRYPTION PASSWORD -->
+  <Config Name="ACTUAL_BUDGET_ENCRYPTION_PASSWORD"
+          Target="ACTUAL_BUDGET_ENCRYPTION_PASSWORD"
+          Default=""
+          Type="Variable"
+          Mask="true"
+          Display="advanced"
+          Required="false">
+    Optional encryption password. Only needed if your Actual setup uses a different password
+    to unlock the budget data than ACTUAL_PASSWORD.
+  </Config>
+
+  <!-- AUTH TOKEN FOR MCP CLIENTS -->
+  <Config Name="BEARER_TOKEN"
+          Target="BEARER_TOKEN"
+          Default=""
+          Type="Variable"
+          Mask="true"
+          Display="always"
+          Required="false">
+    Optional bearer token used to restrict access to the HTTP SSE MCP endpoint.
+    Use the same token value in your MCP clients.
+  </Config>
+
+  <Description>
+    Actual MCP Server integrates Actual Budget with AI assistants using the Model Context Protocol.
+
+    This template supports two configuration patterns:
+
+    1. Default remote API server mode:
+       - ACTUAL_SERVER_URL is set to the URL of your Actual Budget server.
+       - ACTUAL_PASSWORD and optionally ACTUAL_BUDGET_SYNC_ID are set.
+       - Local Actual Data Directory and ACTUAL_DATA_DIR can be left empty.
+
+    2. Local data directory mode:
+       - Leave ACTUAL_SERVER_URL empty.
+       - Map Local Actual Data Directory to your host data folder.
+       - Set ACTUAL_DATA_DIR to the path inside the container, usually /data.
+       - Optionally set ACTUAL_BUDGET_ENCRYPTION_PASSWORD if required.
+
+    After installation, you may edit the container in Unraid and manually add runtime flags
+    such as --sse, --enable-write, and --enable-bearer in the Post Arguments field if you want
+    to run the server as an HTTP SSE endpoint. This template does not inject any additional
+    commands or arguments into the docker run command by itself.
+
+    The container does not add telemetry or tracking and only accesses Actual Budget data
+    that you explicitly configure via environment variables and volume mappings.
+  </Description>
+</Container>

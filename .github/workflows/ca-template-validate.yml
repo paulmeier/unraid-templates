@@ -1,0 +1,37 @@
+name: CA Template Validation
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate-templates:
+    name: Validate Unraid CA XML templates
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies (if any)
+        run: |
+          # Currently the validation script has no external deps.
+          # If you later add dependencies, install them here.
+          echo "No dependencies to install"
+
+      - name: Run CA template validator
+        run: |
+          # Adjust paths if your script/templates live elsewhere
+          chmod +x scripts/validate_unraid_ca_templates.py || true
+          python scripts/validate_unraid_ca_templates.py templates/
